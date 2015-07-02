@@ -48,7 +48,7 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
 
                 template += '<li class="divider" ng-show="settings.selectionLimit > 1"></li>';
                 template += '<li role="presentation" ng-show="settings.selectionLimit > 1"><a role="menuitem">{{selectedModel.length}} {{texts.selectionOf}} {{settings.selectionLimit}} {{texts.selectionCount}}</a></li>';
-
+                template += '<li ng-show="settings.showButtonSubmit" style="margin-left: 20px; margin-top: 10px"><button type="button" ng-class="settings.buttonSubmitClasses" ng-click="submit()">{{ texts.buttonSubmitDefaultText }}</button></li>';
                 template += '</ul>';
                 template += '</div>';
 
@@ -56,7 +56,7 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
             },
             link: function ($scope, $element, $attrs) {
                 var $dropdownTrigger = $element.children()[0];
-                
+
                 $scope.toggleDropdown = function () {
                     $scope.open = !$scope.open;
                 };
@@ -72,7 +72,8 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                     onSelectAll: angular.noop,
                     onDeselectAll: angular.noop,
                     onInitDone: angular.noop,
-                    onMaxSelectionReached: angular.noop
+                    onMaxSelectionReached: angular.noop,
+                    onSubmit: angular.noop
                 };
 
                 $scope.settings = {
@@ -87,8 +88,10 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                     selectionLimit: 0,
                     showCheckAll: true,
                     showUncheckAll: true,
+                    showButtonSubmit: false,
                     closeOnSelect: false,
                     buttonClasses: 'btn btn-default',
+                    buttonSubmitClasses: 'btn btn-default',
                     closeOnDeselect: false,
                     groupBy: $attrs.groupBy || undefined,
                     groupByTextProvider: null,
@@ -103,7 +106,8 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                     selectionOf: '/',
                     searchPlaceholder: 'Search...',
                     buttonDefaultText: 'Select',
-                    dynamicButtonTextSuffix: 'checked'
+                    dynamicButtonTextSuffix: 'checked',
+                    buttonSubmitDefaultText: 'submit'
                 };
 
                 $scope.searchFilter = $scope.searchFilter || '';
@@ -261,7 +265,6 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                         clearObject($scope.selectedModel);
                         angular.extend($scope.selectedModel, finalObj);
                         $scope.externalEvents.onItemSelect(finalObj);
-                        if ($scope.settings.closeOnSelect) $scope.open = false;
 
                         return;
                     }
@@ -277,7 +280,6 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                         $scope.selectedModel.push(finalObj);
                         $scope.externalEvents.onItemSelect(finalObj);
                     }
-                    if ($scope.settings.closeOnSelect) $scope.open = false;
                 };
 
                 $scope.isChecked = function (id) {
@@ -288,7 +290,12 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                     return _.findIndex($scope.selectedModel, getFindObj(id)) !== -1;
                 };
 
+                $scope.submit = function() {
+                    $scope.externalEvents.onSubmit();
+                };
+
                 $scope.externalEvents.onInitDone();
             }
         };
-}]);
+    }]
+);
