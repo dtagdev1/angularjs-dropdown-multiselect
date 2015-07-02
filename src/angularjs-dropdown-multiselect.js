@@ -121,6 +121,16 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                         });
                     }
 
+                    if (angular.isDefined($scope.settings.buttonSettingDisable)) {
+                        $scope.$watch('extraSettings', function (oldValue, newValue) {
+                            if (angular.isDefined(newValue)) {
+                                $scope.settings.buttonSettingDisable = newValue.buttonSettingDisable;
+
+                                angular.extend($scope.settings, $scope.extraSettings || []);
+                            }
+                        }, true);
+                    }
+
                     angular.extend($scope.settings, $scope.extraSettings || []);
                     angular.extend($scope.externalEvents, $scope.events || []);
                     angular.extend($scope.texts, $scope.translationTexts);
@@ -292,7 +302,7 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                     };
 
                     $scope.submit = function() {
-                        $scope.externalEvents.onSubmit($scope.settings);
+                        $scope.externalEvents.onSubmit();
                     };
 
                     $scope.externalEvents.onInitDone();
